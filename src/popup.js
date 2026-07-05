@@ -7,6 +7,10 @@
   let activeFormat = 'markdown';
   let searchQuery = '';
 
+  // A YouTube page we can extract from: standard watch pages and Shorts.
+  const isYouTubeVideoUrl = (url) =>
+    !!url && (url.includes('youtube.com/watch') || url.includes('youtube.com/shorts/'));
+
   // ============================================================
   // INITIALIZATION
   // ============================================================
@@ -14,7 +18,7 @@
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     currentTab = tab;
 
-    if (!tab?.url?.includes('youtube.com/watch')) {
+    if (!isYouTubeVideoUrl(tab?.url)) {
       showState('not-youtube');
       return;
     }
@@ -618,7 +622,10 @@
   }
 
   function escapeYaml(str) {
-    return str.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    return String(str == null ? '' : str)
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\r?\n/g, ' ');
   }
 
   function sanitizeFilename(name) {
@@ -631,7 +638,10 @@
   }
 
   function renderMarkdownToHtml(text) {
-    return text
+    // Escape HTML first so an unexpected AI response cannot inject markup into
+    // the popup (result is assigned via innerHTML). The markdown transforms
+    // only match *, #, - so escaping does not affect them.
+    return escapeHtml(String(text == null ? '' : text))
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/^### (.+)$/gm, '<h4>$1</h4>')

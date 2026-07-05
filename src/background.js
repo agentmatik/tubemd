@@ -1,6 +1,24 @@
 // TubeMD - Background Service Worker
 // Handles: AI summarization, skill generation, settings storage, keyboard shortcut
-// Version: 1.1.0
+// Version: 1.0.0
+
+// Network safety: bound every provider request so a hung connection surfaces
+// as an error instead of leaving the UI spinning forever.
+const AI_FETCH_TIMEOUT_MS = 60000;
+async function fetchWithTimeout(resource, options = {}, timeoutMs = AI_FETCH_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(resource, { ...options, signal: controller.signal });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Request timed out. Check your connection and try again.');
+    }
+    throw new Error('Network error reaching the AI provider. Check your connection.');
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 // ============================================================
 // KEYBOARD SHORTCUT - Toggle inline panel on YouTube pages
@@ -8,7 +26,7 @@
 chrome.commands?.onCommand?.addListener((command) => {
   if (command === 'toggle-panel') {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab?.url?.includes('youtube.com/watch')) {
+      if (tab?.url?.includes('youtube.com/watch') || tab?.url?.includes('youtube.com/shorts/')) {
         chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: () => document.dispatchEvent(new CustomEvent('yt-to-text-toggle'))
@@ -70,9 +88,13 @@ const DEFAULT_SETTINGS = {
   theme: 'light'
 };
 
+// Settings (including user API keys) live in chrome.storage.local, NOT sync.
+// storage.sync would upload the keys to the user's Google account and across
+// their devices; keeping them local means the key never leaves this machine.
+// Keep this in sync with options.js, which reads/writes the same key.
 async function getSettings() {
   return new Promise(resolve => {
-    chrome.storage.sync.get(['tubeMdSettings'], (result) => {
+    chrome.storage.local.get(['tubeMdSettings'], (result) => {
       resolve({ ...DEFAULT_SETTINGS, ...(result.tubeMdSettings || {}) });
     });
   });
@@ -80,7 +102,7 @@ async function getSettings() {
 
 async function saveSettings(settings) {
   return new Promise(resolve => {
-    chrome.storage.sync.set({ tubeMdSettings: settings }, resolve);
+    chrome.storage.local.set({ tubeMdSettings: settings }, resolve);
   });
 }
 
@@ -130,7 +152,7 @@ STRICT FORMAT REQUIREMENTS:
 
 2. After frontmatter, write the skill body in Markdown using these principles:
    - Use imperative/infinitive form ("Extract data", "Configure the API", NOT "You should extract")
-   - Be concise and token-efficient — challenge each piece: "Does this justify its token cost?"
+   - Be concise and token-efficient - challenge each piece: "Does this justify its token cost?"
    - Prefer concise examples over verbose explanations
    - Structure as actionable steps/workflows, not a summary
    - Include code examples if the video covers coding (use fenced code blocks)
@@ -182,16 +204,16 @@ STRICT FORMAT REQUIREMENTS:
    - Use imperative form ("Run the command", "Create the file")
    - Include code examples in fenced code blocks with language tags
    - Use headers (##) to organize major sections
-   - Focus on PROCEDURAL knowledge — step-by-step workflows
+   - Focus on PROCEDURAL knowledge - step-by-step workflows
    - Include validation steps where appropriate ("Verify by running...")
    - Keep concise but comprehensive
    - Reference tools Claude Code has: Read, Write, Edit, Bash, Search, etc.
 
 3. String substitutions you can use in instructions:
-   - {{cwd}} — current working directory
-   - {{os}} — operating system
-   - {{shell}} — user's shell
-   - {{arguments}} — user-provided arguments
+   - {{cwd}} - current working directory
+   - {{os}} - operating system
+   - {{shell}} - user's shell
+   - {{arguments}} - user-provided arguments
 
 4. Do NOT include: README content, changelogs, author credits, or meta-commentary
 
@@ -255,8 +277,8 @@ async function callAI(provider, apiKey, systemPrompt, userMessage) {
 
 // --- Gemini ---
 async function callGemini(apiKey, systemPrompt, userMessage) {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+  const response = await fetchWithTimeout(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -282,7 +304,7 @@ async function callGemini(apiKey, systemPrompt, userMessage) {
 
 // --- OpenAI (ChatGPT) ---
 async function callOpenAI(apiKey, systemPrompt, userMessage) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -312,7 +334,7 @@ async function callOpenAI(apiKey, systemPrompt, userMessage) {
 
 // --- Anthropic (Claude) ---
 async function callClaude(apiKey, systemPrompt, userMessage) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
