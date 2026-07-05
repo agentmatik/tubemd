@@ -16,7 +16,9 @@
   // LOAD SETTINGS
   // ============================================================
   async function loadSettings() {
-    const result = await chrome.storage.sync.get(['tubeMdSettings']);
+    // Read from chrome.storage.local (device-only). See background.js for why
+    // API keys are deliberately kept out of chrome.storage.sync.
+    const result = await chrome.storage.local.get(['tubeMdSettings']);
     const settings = result.tubeMdSettings || {};
 
     // Provider
@@ -93,7 +95,7 @@
       defaultFormat: format
     };
 
-    await chrome.storage.sync.set({ tubeMdSettings: settings });
+    await chrome.storage.local.set({ tubeMdSettings: settings });
 
     const status = document.getElementById('save-status');
     status.textContent = 'Settings saved!';
@@ -151,7 +153,7 @@
         </div>
         <p class="section-desc">Your 14-day trial has expired. Upgrade to Pro to unlock Markdown export and AI summaries.</p>
         <p class="section-desc" style="margin-top:8px;">Total extractions: ${usageCount}</p>
-        <a href="https://agentmatik.ai/tubemd-pro" target="_blank" style="display:inline-block;margin-top:12px;background:#e74c6f;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">Upgrade to Pro &mdash; $49 Lifetime</a>
+        <a href="https://agentmatik.ai/tubemd-pro" target="_blank" style="display:inline-block;margin-top:12px;background:#e74c6f;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">Upgrade to Pro - $49 Lifetime</a>
       `;
     }
   }

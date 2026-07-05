@@ -13,11 +13,29 @@
   if (window.__tubeMdLoaded) return;
   window.__tubeMdLoaded = true;
 
+  // Flip to true when debugging locally. Keeps the console clean in production.
+  const DEBUG = false;
+  const log = (...args) => { if (DEBUG) console.log('[TubeMD]', ...args); };
+  const warn = (...args) => { if (DEBUG) console.warn('[TubeMD]', ...args); };
+
+  // Network safety: never let a single fetch hang the UI forever.
+  const FETCH_TIMEOUT_MS = 20000;
+  async function fetchWithTimeout(resource, options = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      return await fetch(resource, { ...options, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   let currentVideoId = null;
   let transcriptData = null;
   let currentLang = '';
   let panelVisible = true;
   let searchQuery = '';
+  let panelObserver = null; // single MutationObserver; guarded against leaks
 
   // ============================================================
   // MESSAGE HANDLER - Responds to popup.js requests
@@ -159,7 +177,7 @@
     try {
       const pageResult = getCaptionTracksFromPage();
       if (pageResult) {
-        console.log('[TubeMD] Method 1: Found captions in page HTML');
+        log('Method 1: found captions in page HTML');
         return await buildTranscriptResponse(pageResult, videoId, lang);
       }
     } catch (e) { errors.push(`Page HTML: ${e.message}`); }
@@ -168,7 +186,7 @@
     try {
       const androidResult = await fetchViaInnerTube(videoId, 'ANDROID');
       if (androidResult) {
-        console.log('[TubeMD] Method 2: Found captions via InnerTube ANDROID');
+        log('Method 2: found captions via InnerTube ANDROID');
         return await buildTranscriptResponse(androidResult, videoId, lang);
       }
     } catch (e) { errors.push(`InnerTube ANDROID: ${e.message}`); }
@@ -177,7 +195,7 @@
     try {
       const webResult = await fetchViaInnerTube(videoId, 'WEB');
       if (webResult) {
-        console.log('[TubeMD] Method 3: Found captions via InnerTube WEB');
+        log('Method 3: found captions via InnerTube WEB');
         return await buildTranscriptResponse(webResult, videoId, lang);
       }
     } catch (e) { errors.push(`InnerTube WEB: ${e.message}`); }
@@ -254,7 +272,7 @@
     const apiKey = getPageInnerTubeConfig().apiKey || 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
     const url = `https://www.youtube.com/youtubei/v1/player?key=${apiKey}&prettyPrint=false`;
 
-    const resp = await fetch(url, {
+    const resp = await fetchWithTimeout(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
@@ -300,7 +318,8 @@
     let selectedTrack = lang ? tracks.find(t => t.languageCode === lang) : null;
     if (!selectedTrack) selectedTrack = tracks[0];
 
-    const xmlResp = await fetch(selectedTrack.baseUrl, { credentials: 'include' });
+    if (!selectedTrack?.baseUrl) throw new Error('Selected caption track has no transcript URL.');
+    const xmlResp = await fetchWithTimeout(selectedTrack.baseUrl, { credentials: 'include' });
     if (!xmlResp.ok) throw new Error(`Failed to fetch transcript XML: HTTP ${xmlResp.status}`);
     const xml = await xmlResp.text();
     if (!xml || xml.length < 10) throw new Error('Transcript XML response was empty');
@@ -320,9 +339,13 @@
   // XML PARSING (srv3 + classic)
   // ============================================================
   function parseTranscriptXml(xml) {
-    try { return parseWithDOMParser(xml); }
-    catch (e) {
-      console.warn('[TubeMD] DOMParser failed, using regex:', e.message);
+    try {
+      const result = parseWithDOMParser(xml);
+      if (result.length > 0) return result;
+      // DOMParser produced nothing usable - fall through to the regex parser.
+      return parseWithRegex(xml);
+    } catch (e) {
+      warn('DOMParser failed, using regex:', e.message);
       return parseWithRegex(xml);
     }
   }
@@ -330,6 +353,11 @@
   function parseWithDOMParser(xml) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(xml, 'text/xml');
+    // DOMParser does not throw on malformed XML; it embeds a <parsererror>.
+    // Detect it so parseTranscriptXml can fall back to the regex parser.
+    if (doc.querySelector('parsererror')) {
+      throw new Error('XML parse error');
+    }
     const transcript = [];
 
     // srv3 format
@@ -414,10 +442,20 @@
            document.querySelector('ytd-watch-flexy #secondary');
   }
 
+  // Bound the retry loop: on some layouts (Shorts, theater, YouTube redesigns)
+  // the secondary column never appears. Give up after ~15s instead of spinning
+  // a setTimeout forever. The popup remains a fully working fallback entry point.
+  let injectAttempts = 0;
+  const MAX_INJECT_ATTEMPTS = 30; // 30 * 500ms = 15s
+
   function injectPanel() {
-    const secondary = findSecondaryColumn();
-    if (!secondary) { setTimeout(injectPanel, 500); return; }
     if (document.getElementById('ytt-panel')) return;
+    const secondary = findSecondaryColumn();
+    if (!secondary) {
+      if (injectAttempts++ < MAX_INJECT_ATTEMPTS) setTimeout(injectPanel, 500);
+      return;
+    }
+    injectAttempts = 0;
 
     const panel = createPanel();
     secondary.insertBefore(panel, secondary.firstChild);
@@ -632,8 +670,13 @@
   // VIDEO DETECTION
   // ============================================================
   function getVideoId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('v');
+    // Standard watch URL: ?v=ID
+    const fromQuery = new URLSearchParams(window.location.search).get('v');
+    if (fromQuery) return fromQuery;
+    // Shorts (/shorts/ID) and embeds (/embed/ID) have no ?v= param.
+    const pathMatch = window.location.pathname.match(/\/(?:shorts|embed)\/([A-Za-z0-9_-]{6,})/);
+    if (pathMatch) return pathMatch[1];
+    return null;
   }
 
   function getPageTitle() {
@@ -653,11 +696,14 @@
     };
     checkVideo();
 
-    const observer = new MutationObserver(() => {
+    // Guard against observer leaks: YouTube's SPA can re-run injectPanel, and a
+    // fresh observer each time would accumulate. Keep exactly one.
+    if (panelObserver) panelObserver.disconnect();
+    panelObserver = new MutationObserver(() => {
       checkVideo();
       if (!document.getElementById('ytt-panel')) injectPanel();
     });
-    observer.observe(document.querySelector('title') || document.head, {
+    panelObserver.observe(document.querySelector('title') || document.head, {
       childList: true, subtree: true, characterData: true
     });
 
@@ -902,7 +948,12 @@
   }
 
   function escapeYaml(str) {
-    return str.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    // Escape backslashes first, then double quotes, then flatten newlines -
+    // values are emitted inside double-quoted YAML scalars.
+    return String(str == null ? '' : str)
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\r?\n/g, ' ');
   }
 
   function sanitizeFilename(name) {
@@ -910,7 +961,10 @@
   }
 
   function renderMarkdown(text) {
-    return text
+    // Escape HTML first so a malicious/unexpected AI response cannot inject
+    // markup into the panel (the result is assigned via innerHTML below).
+    // The markdown transforms only match *, #, - so escaping does not break them.
+    return escapeHtml(String(text == null ? '' : text))
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/^### (.+)$/gm, '<h4>$1</h4>')
