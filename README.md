@@ -1,44 +1,128 @@
 # TubeMD - YouTube to Markdown Transcript
 
-A Chrome extension (Manifest V3) that extracts YouTube video transcripts as clean Markdown with YAML frontmatter, optimized for feeding to AI agents. Optional AI summaries via Gemini, ChatGPT, or Claude using your own API key.
+A Manifest V3 Chrome extension that turns any YouTube video's transcript into
+clean Markdown with YAML frontmatter, optimized for feeding to AI agents.
+Optional AI summaries via Google Gemini, OpenAI, or Anthropic Claude - using
+**your own** API key.
 
-Built by [Agentmatik](https://agentmatik.ai). Original code - this is a from-scratch implementation, not a fork of another extension.
+Built by [Agentmatik](https://agentmatik.ai). Original code, not a fork.
 
-## Status
+- No backend. Everything runs in your browser.
+- No telemetry, no tracking, no account.
+- Your API keys stay on your device and go only to the provider you pick.
 
-- **Version:** 1.0.0 (prototype, built in Manus, migrated here 2026-07-05)
-- **Stage:** working prototype - not yet on the Chrome Web Store
-- **Next:** polish to store-ready, then submit. See `kickoff-prompt.md` for the dev-thread starting point and the roadmap.
+## Features
 
-## Repository layout
+- **Markdown export with YAML frontmatter** - title, author, URL, publish date,
+  duration, views, description, language, and extraction timestamp.
+- **Plain-text export** - timestamped transcript.
+- **AI summaries** - Gemini (free tier), OpenAI, or Claude, with your key.
+- **SKILL.md generation** - turn a how-to video into a Claude Code or Manus skill.
+- **Multi-language** - extract any available caption track, manual or auto.
+- **Dual UI** - an inline panel in YouTube's right column plus a toolbar popup.
+- **In-transcript search**, click-a-timestamp-to-seek, one-click copy/download.
+- **Keyboard shortcut** - `Ctrl+Shift+Y` (`Cmd+Shift+Y` on macOS).
 
-| Path | What it is |
-|------|-----------|
-| `src/` | The extension itself. Load this via `chrome://extensions` > Developer mode > Load unpacked. Ships its own `src/README.md`. |
-| `manus-export/` | Complete history of how it was built. `transcript.md` is the full 553-message chat; `messages-raw.json` + `task-detail.json` are the lossless source; `files/` holds every attachment including all intermediate build zips. |
-| `kickoff-prompt.md` | Paste into a fresh Claude Code session (started in this folder) to continue development. |
+## Install (developer / unpacked)
 
-## Load it locally
+Not yet on the Chrome Web Store. To run it locally:
 
-1. `git clone` this repo.
-2. Open `chrome://extensions`, enable **Developer mode** (top right).
-3. Click **Load unpacked** and select the `src/` folder.
-4. Open any YouTube watch page - the inline panel appears in the right column, or click the extension icon for the popup. Shortcut: `Ctrl+Shift+Y` (`Cmd+Shift+Y` on Mac).
+1. Clone this repository.
+2. Open `chrome://extensions/` and enable **Developer mode** (top right).
+3. Click **Load unpacked** and select the **`src/`** folder.
+4. Open any YouTube watch page. The TubeMD panel appears in the right column, or
+   click the toolbar icon for the popup.
 
-## What it does
+## Usage
 
-- Extracts the transcript of any YouTube video with captions and renders it as Markdown (with YAML frontmatter: title, author, URL, date, duration, language) or plain timestamped text.
-- Real-time search within the transcript, click-a-timestamp to seek, one-click copy or download as `.md`/`.txt`.
-- Optional AI summary via Google Gemini, OpenAI, or Anthropic - the user supplies their own API key (stored locally; the extension declares host permissions for those three APIs).
+### Extract a transcript
+1. On a YouTube video, click **GET TRANSCRIPTION** (inline panel or popup).
+2. Switch caption language with the dropdown if more than one is available.
+3. Copy or download as `.md` or `.txt`, or search within the transcript.
+
+If a video has no captions, TubeMD shows a clear "no captions available"
+message rather than failing silently.
+
+### AI summaries and skills (bring your own key)
+1. Open **Settings** (the gear icon, or right-click the extension > Options).
+2. Pick a provider and paste your API key:
+   - **Gemini** - [Google AI Studio](https://aistudio.google.com/apikey) (free tier)
+   - **OpenAI** - [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Claude** - [Anthropic Console](https://console.anthropic.com/settings/keys)
+3. Extract a transcript, then click **Generate Summary** or **Generate Skill**.
+
+Keys are stored in `chrome.storage.local` (this device only) and are sent only
+to the provider you selected. See [PRIVACY.md](PRIVACY.md).
+
+## Markdown output
+
+```markdown
+---
+title: "Video Title"
+author: "Channel Name"
+site: "YouTube"
+domain: "youtube.com"
+url: "https://www.youtube.com/watch?v=..."
+published: "2026-03-12"
+duration: "1h 30m 45s"
+views: "150000"
+language: "en"
+extracted: "2026-07-06T12:00:00.000Z"
+---
+
+# Video Title
+
+**[00:00]** First transcript segment...
+```
 
 ## How extraction works
 
-TubeMD reads YouTube's own transcript data (the InnerTube/`get_transcript` approach) rather than scraping the DOM - see the technical sections of `manus-export/transcript.md` for the full method and its known fragility (YouTube changes break transcript extensions often; this is the main maintenance risk).
+TubeMD reads YouTube's own transcript data rather than scraping rendered DOM. It
+tries, in order:
 
-## Monetization (as prototyped)
+1. The `ytInitialPlayerResponse` embedded in the page.
+2. YouTube's InnerTube `player` endpoint with the ANDROID client.
+3. InnerTube with the WEB client.
 
-The build already contains a licensing scaffold: a 14-day free trial, then a Pro upgrade gating Markdown export and AI summaries. This is a starting point to validate during the polish thread, not a finalized model.
+Whichever returns caption tracks first wins; the selected track's caption file
+is fetched and parsed (both `srv3` and classic formats, with a regex fallback if
+the XML parser chokes). This is inherently fragile: **YouTube changes its
+internal data regularly, and that is the main maintenance risk for this
+extension.** Failures surface a visible error, not a silent blank.
+
+## Permissions
+
+| Permission | Why |
+|-----------|-----|
+| `activeTab` | Act on the tab you are viewing when you click the extension. |
+| `storage` | Save your provider choice and API key locally. |
+| `scripting` | Toggle the inline panel via the keyboard shortcut. |
+| host: `www.youtube.com` | Read transcript and metadata from the page. |
+| host: `generativelanguage.googleapis.com` | Gemini summaries, only if you choose Gemini. |
+| host: `api.openai.com` | OpenAI summaries, only if you choose OpenAI. |
+| host: `api.anthropic.com` | Claude summaries, only if you choose Claude. |
+
+The three AI hosts are contacted only when you actively request a summary or
+skill. Full detail in [PRIVACY.md](PRIVACY.md).
+
+## Privacy
+
+No backend, no telemetry, no tracking. Transcripts are processed locally and are
+sent to a third-party AI provider only when you explicitly ask for a summary or
+skill, under your own key. Read the full policy in [PRIVACY.md](PRIVACY.md).
+
+## Trial / Pro (prototype)
+
+The build includes a licensing scaffold: a 14-day trial, then a Pro upgrade
+gating Markdown export and AI summaries. This is a prototype to validate, not a
+finalized model, and it is enforced only in the popup UI.
+
+## Development
+
+No build step and no dependencies - the files in `src/` load as-is. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for setup, conventions, and the manual test
+matrix. Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-Proprietary - (c) 2026 Agentmatik s.r.o. All rights reserved. Not for redistribution.
+[MIT](LICENSE) - Copyright (c) 2026 Agentmatik.
