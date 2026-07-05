@@ -1,0 +1,301 @@
+/* TubeMD Options Page Styles */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  line-height: 1.5;
+}
+
+.options-container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+/* Header */
+.options-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.brand h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+.version {
+  font-size: 12px;
+  color: #86868b;
+  font-weight: 500;
+}
+
+/* Sections */
+.settings-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e5e7;
+}
+
+.settings-section h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #1d1d1f;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: #86868b;
+  margin-bottom: 16px;
+}
+
+/* Provider Selector */
+.provider-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.provider-option {
+  flex: 1;
+  cursor: pointer;
+}
+
+.provider-option input[type="radio"] {
+  display: none;
+}
+
+.provider-card {
+  padding: 14px;
+  border: 2px solid #e5e5e7;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.provider-option input:checked + .provider-card {
+  border-color: #e74c6f;
+  background: #fef2f4;
+}
+
+.provider-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 2px;
+}
+
+.provider-model {
+  font-size: 11px;
+  color: #86868b;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+}
+
+.provider-note {
+  font-size: 10px;
+  color: #34c759;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* API Key Inputs */
+.api-key-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.api-key-section label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.key-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+}
+
+.key-row input:focus {
+  border-color: #e74c6f;
+}
+
+.btn-toggle-vis {
+  background: none;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #86868b;
+  transition: all 0.2s;
+}
+
+.btn-toggle-vis:hover {
+  background: #f0f0f0;
+  color: #1d1d1f;
+}
+
+.key-hint {
+  font-size: 11px;
+  color: #86868b;
+  margin-top: 6px;
+}
+
+.key-hint a {
+  color: #e74c6f;
+  text-decoration: none;
+}
+
+.key-hint a:hover {
+  text-decoration: underline;
+}
+
+/* Format Selector */
+.format-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.format-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid #e5e5e7;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+}
+
+.format-option:hover {
+  background: #fafafa;
+}
+
+.format-option input:checked ~ span:first-of-type {
+  font-weight: 600;
+}
+
+.format-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.format-badge.recommended {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Contact */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #e74c6f;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contact-link:hover {
+  text-decoration: underline;
+}
+
+/* Save Bar */
+.save-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-save {
+  background: #1d1d1f;
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background: #333;
+}
+
+.save-status {
+  font-size: 13px;
+  color: #34c759;
+  font-weight: 500;
+}
+
+/* Footer */
+.options-footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.options-footer p {
+  font-size: 12px;
+  color: #86868b;
+}
+
+.options-footer a {
+  color: #e74c6f;
+  text-decoration: none;
+}
+
+.options-footer a:hover {
+  text-decoration: underline;
+}

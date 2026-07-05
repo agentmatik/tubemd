@@ -1,0 +1,531 @@
+/* ============================================================
+   TubeMD - Inline Panel Styles (YouTube secondary column)
+   Version: 1.1.0
+   ============================================================ */
+
+/* Reset for our panel */
+#ytt-panel *,
+#ytt-panel *::before,
+#ytt-panel *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ============================================================
+   PANEL CONTAINER
+   ============================================================ */
+#ytt-panel {
+  position: relative;
+  width: 100%;
+  background-color: #0f0f1a;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e0e0e0;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+#ytt-panel .ytt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #0f0f1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#ytt-panel .ytt-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#ytt-panel .ytt-logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+#ytt-panel .ytt-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+#ytt-panel .ytt-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #0f0f1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#ytt-panel .ytt-tab {
+  padding: 7px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #aaaacc;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+#ytt-panel .ytt-tab:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+#ytt-panel .ytt-tab.active {
+  color: #ffffff;
+  background-color: #e74c6f;
+  border-color: #e74c6f;
+}
+
+/* ============================================================
+   ACTION BAR (GET TRANSCRIPTION + Contact)
+   ============================================================ */
+#ytt-panel .ytt-action-bar {
+  padding: 12px 16px;
+  text-align: center;
+}
+
+#ytt-panel .ytt-btn-get {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background-color: #e53935;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#ytt-panel .ytt-btn-get:hover:not(:disabled) {
+  background-color: #c62828;
+}
+
+#ytt-panel .ytt-btn-get:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#ytt-panel .ytt-contact-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #aaa;
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
+}
+
+#ytt-panel .ytt-contact-link:hover {
+  color: #fff;
+}
+
+/* ============================================================
+   LANGUAGE & ACTIONS BAR
+   ============================================================ */
+#ytt-panel .ytt-lang-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background-color: #0f0f1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#ytt-panel .ytt-lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #aaaacc;
+}
+
+#ytt-panel .ytt-lang-selector select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  appearance: auto;
+}
+
+#ytt-panel .ytt-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================
+   ICON BUTTONS
+   ============================================================ */
+#ytt-panel .ytt-icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #8888aa;
+  background: transparent;
+  border: none;
+}
+
+#ytt-panel .ytt-icon-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+#ytt-panel .ytt-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #0f0f1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#ytt-panel .ytt-search-bar input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+
+#ytt-panel .ytt-search-bar input:focus {
+  border-color: #e74c6f;
+}
+
+#ytt-panel #ytt-search-count {
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0.7;
+  color: #aaaacc;
+}
+
+/* ============================================================
+   SETTINGS PANEL
+   ============================================================ */
+#ytt-panel .ytt-settings-panel {
+  padding: 16px;
+  background-color: #12122a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#ytt-panel .ytt-settings-panel h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+#ytt-panel .ytt-settings-panel label {
+  font-size: 12px;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+  color: #aaaacc;
+}
+
+#ytt-panel .ytt-api-key-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+#ytt-panel .ytt-api-key-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+
+#ytt-panel .ytt-api-key-row input:focus {
+  border-color: #e74c6f;
+}
+
+#ytt-panel .ytt-hint {
+  font-size: 11px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  color: #6666aa;
+}
+
+#ytt-panel .ytt-hint a {
+  color: #e74c6f;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   CONTENT AREA
+   ============================================================ */
+#ytt-panel .ytt-content {
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #0f0f1a;
+}
+
+#ytt-panel .ytt-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+#ytt-panel .ytt-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#ytt-panel .ytt-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+#ytt-panel .ytt-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Tab Content */
+#ytt-panel .ytt-tab-content {
+  display: none;
+}
+
+#ytt-panel .ytt-tab-content.active {
+  display: block;
+}
+
+/* ============================================================
+   TRANSCRIPT LIST
+   ============================================================ */
+#ytt-panel .ytt-transcript-list {
+  padding: 0;
+}
+
+#ytt-panel .ytt-transcript-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background-color 0.15s ease;
+  align-items: flex-start;
+}
+
+#ytt-panel .ytt-transcript-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+#ytt-panel .ytt-transcript-item.ytt-hidden {
+  display: none;
+}
+
+#ytt-panel .ytt-timestamp {
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  padding-top: 2px;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  min-width: 42px;
+  color: #e74c6f;
+}
+
+#ytt-panel .ytt-timestamp:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+#ytt-panel .ytt-text {
+  font-size: 13px;
+  line-height: 1.55;
+  word-break: break-word;
+  color: #d0d0e0;
+}
+
+#ytt-panel mark {
+  background-color: #e74c6f;
+  color: #fff;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ============================================================
+   SUMMARY CONTENT
+   ============================================================ */
+#ytt-panel .ytt-summary-content {
+  padding: 16px;
+}
+
+#ytt-panel .ytt-summary-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #d0d0e0;
+}
+
+#ytt-panel .ytt-summary-text h2,
+#ytt-panel .ytt-summary-text h3,
+#ytt-panel .ytt-summary-text h4 {
+  color: #ffffff;
+  margin: 14px 0 6px;
+}
+
+#ytt-panel .ytt-summary-text h2 { font-size: 16px; }
+#ytt-panel .ytt-summary-text h3 { font-size: 15px; }
+#ytt-panel .ytt-summary-text h4 { font-size: 14px; }
+
+#ytt-panel .ytt-summary-text p {
+  margin-bottom: 10px;
+}
+
+#ytt-panel .ytt-summary-text ul {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+#ytt-panel .ytt-summary-text li {
+  margin-bottom: 4px;
+  list-style-type: disc;
+}
+
+#ytt-panel .ytt-summary-text strong {
+  color: #e74c6f;
+}
+
+#ytt-panel .ytt-summary-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+#ytt-panel .ytt-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+#ytt-panel .ytt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#ytt-panel .ytt-btn-primary {
+  background-color: #e74c6f;
+  color: #ffffff;
+}
+
+#ytt-panel .ytt-btn-primary:hover:not(:disabled) {
+  background-color: #d43d60;
+}
+
+#ytt-panel .ytt-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+
+#ytt-panel .ytt-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ============================================================
+   PLACEHOLDER / LOADING STATE
+   ============================================================ */
+#ytt-panel .ytt-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  gap: 12px;
+}
+
+#ytt-panel .ytt-placeholder p {
+  font-size: 13px;
+  opacity: 0.7;
+  line-height: 1.5;
+  color: #aaaacc;
+}
+
+/* Spinner */
+#ytt-panel .ytt-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #e74c6f;
+  border-radius: 50%;
+}
+
+#ytt-panel .ytt-spinner.spinning {
+  animation: ytt-spin 0.8s linear infinite;
+}
+
+@keyframes ytt-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   TOAST NOTIFICATION
+   ============================================================ */
+#ytt-panel .ytt-toast {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 100;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+#ytt-panel .ytt-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

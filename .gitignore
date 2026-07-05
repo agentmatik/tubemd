@@ -1,0 +1,15 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node (if a build toolchain is added later)
+node_modules/
+dist/
+*.log
+
+# Packaged extension artifacts (built on demand, not source)
+*.pem
+web-ext-artifacts/
