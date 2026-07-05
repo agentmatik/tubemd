@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <title>TubeMD</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="popup-header">
+      <div class="header-brand">
+        <img src="icons/icon48.png" alt="TubeMD" class="header-icon">
+        <span class="header-title">TubeMD</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-refresh" class="icon-btn" title="Refresh">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+        <button id="btn-settings" class="icon-btn" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Not on YouTube state -->
+    <div id="state-not-youtube" class="state-panel" style="display:none;">
+      <div class="state-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 16 21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <p class="state-text">Navigate to a YouTube video to extract its transcript.</p>
+    </div>
+
+    <!-- Video detected state -->
+    <div id="state-video" style="display:none;">
+      <!-- Video info -->
+      <div id="video-info">
+        <h2 id="video-title">Loading...</h2>
+        <div class="video-meta">
+          <span class="meta-site">YOUTUBE</span>
+          <span id="video-author" class="meta-author"></span>
+          <span id="video-date" class="meta-date"></span>
+        </div>
+        <div id="video-url" class="video-url"></div>
+      </div>
+
+      <!-- Action bar -->
+      <div id="action-bar">
+        <button id="btn-extract" class="btn btn-primary">GET TRANSCRIPTION</button>
+      </div>
+
+      <!-- Status -->
+      <div id="extract-status" style="display:none;">
+        <span class="status-icon">&#10003;</span>
+        <span class="status-text">EXTRACTED.</span>
+      </div>
+
+      <!-- Format tabs -->
+      <div id="format-tabs" style="display:none;">
+        <button class="format-tab active" data-format="markdown">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          MARKDOWN
+        </button>
+        <button class="format-tab" data-format="text">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          TEXT
+        </button>
+        <button class="format-tab" data-format="summary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          SUMMARY
+        </button>
+        <button class="format-tab" data-format="skill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          SKILL
+        </button>
+      </div>
+
+      <!-- Language selector -->
+      <div id="lang-bar" style="display:none;">
+        <div class="lang-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <select id="lang-select"><option value="">Auto</option></select>
+          <div class="lang-actions">
+            <button id="btn-search" class="icon-btn small" title="Search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button id="btn-copy" class="icon-btn small" title="Copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button id="btn-download" class="icon-btn small" title="Download">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="search-bar" style="display:none;">
+          <input type="text" id="search-input" placeholder="Search transcript..." />
+          <span id="search-count"></span>
+        </div>
+      </div>
+
+      <!-- Content area -->
+      <div id="content-area" style="display:none;">
+        <!-- Markdown tab -->
+        <div id="tab-markdown" class="tab-content active">
+          <pre id="markdown-output" class="code-block"></pre>
+        </div>
+        <!-- Text tab -->
+        <div id="tab-text" class="tab-content">
+          <div id="text-output" class="transcript-list"></div>
+        </div>
+        <!-- Summary tab -->
+        <div id="tab-summary" class="tab-content">
+          <div id="summary-output" class="summary-content">
+            <p class="placeholder-text">Extract transcript first, then generate a summary.</p>
+            <button id="btn-summarize" class="btn btn-secondary" disabled>Generate Summary</button>
+          </div>
+        </div>
+        <!-- Skill tab -->
+        <div id="tab-skill" class="tab-content">
+          <div id="skill-output" class="skill-content">
+            <p class="placeholder-text">Generate a SKILL.md file from this video's content for AI coding agents.</p>
+            <div class="skill-format-selector">
+              <label class="skill-radio">
+                <input type="radio" name="skill-format" value="claude" checked>
+                <span>Claude Code</span>
+              </label>
+              <label class="skill-radio">
+                <input type="radio" name="skill-format" value="manus">
+                <span>Manus</span>
+              </label>
+            </div>
+            <button id="btn-generate-skill" class="btn btn-secondary" disabled>Generate Skill</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trial banner -->
+    <div id="trial-banner" style="display:none;">
+      <div class="trial-info">
+        <span id="trial-text">Free trial: 14 days remaining</span>
+      </div>
+      <button id="btn-upgrade" class="btn btn-upgrade">Upgrade</button>
+    </div>
+
+    <!-- Footer -->
+    <footer id="popup-footer">
+      <a href="mailto:hello@agentmatik.ai" class="footer-link">Contact Support</a>
+      <span class="footer-version" id="footer-version">v1.0.0</span>
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

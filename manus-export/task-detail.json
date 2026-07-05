@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "request_id": "729a47b42be3ba77d50498e7eb598bc7",
+  "task": {
+    "agent_profile": "manus-1.6-max",
+    "created_at": "1775520481",
+    "credit_usage": 9185,
+    "id": "9VEhmPCC18J5q1B28JEH2i",
+    "share_visibility": "private",
+    "status": "stopped",
+    "task_type": "standard",
+    "task_url": "https://manus.im/app/9VEhmPCC18J5q1B28JEH2i",
+    "title": "How Easy Is It to Clone This Plugin?",
+    "updated_at": "1775604325"
+  }
+}
