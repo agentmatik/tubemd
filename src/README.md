@@ -7,31 +7,31 @@ Extract YouTube video transcripts as clean Markdown with YAML frontmatter, optim
 ## Features
 
 ### Core
-- **Markdown Export with YAML Frontmatter** — Title, author, URL, publish date, duration, views, description, language, and extraction timestamp
-- **Plain Text Export** — Timestamped transcript in simple text format
-- **AI Summary** — Generate summaries using Google Gemini (free), OpenAI ChatGPT, or Anthropic Claude
-- **Multi-Language Support** — Extract transcripts in any available caption language
-- **Dual UI** — Inline panel on YouTube + popup window when clicking the extension icon
+- **Markdown Export with YAML Frontmatter** - Title, author, URL, publish date, duration, views, description, language, and extraction timestamp
+- **Plain Text Export** - Timestamped transcript in simple text format
+- **AI Summary** - Generate summaries using Google Gemini (free), OpenAI ChatGPT, or Anthropic Claude
+- **Multi-Language Support** - Extract transcripts in any available caption language
+- **Dual UI** - Inline panel on YouTube + popup window when clicking the extension icon
 
 ### UI
-- **Inline YouTube Panel** — Appears in the secondary column (right side) on YouTube watch pages
-- **Popup Window** — Click the extension icon for a Defuddle-inspired clean popup interface
-- **Search** — Real-time search within transcript with match highlighting
-- **Click-to-Seek** — Click any timestamp to jump to that moment in the video
-- **Copy & Download** — One-click copy to clipboard or download as .md/.txt file
-- **Keyboard Shortcut** — Ctrl+Shift+Y (Cmd+Shift+Y on Mac) to toggle the inline panel
+- **Inline YouTube Panel** - Appears in the secondary column (right side) on YouTube watch pages
+- **Popup Window** - Click the extension icon for a Defuddle-inspired clean popup interface
+- **Search** - Real-time search within transcript with match highlighting
+- **Click-to-Seek** - Click any timestamp to jump to that moment in the video
+- **Copy & Download** - One-click copy to clipboard or download as .md/.txt file
+- **Keyboard Shortcut** - Ctrl+Shift+Y (Cmd+Shift+Y on Mac) to toggle the inline panel
 
 ### Settings
-- **Multi-Provider AI Config** — Choose between Gemini, ChatGPT, or Claude with individual API keys
-- **Default Format** — Set your preferred output format (Markdown or Text)
-- **License Management** — 14-day free trial, then upgrade to Pro for Markdown export and AI summaries
+- **Multi-Provider AI Config** - Choose between Gemini, ChatGPT, or Claude with individual API keys
+- **Default Format** - Set your preferred output format (Markdown or Text)
+- **License Management** - 14-day free trial, then upgrade to Pro for Markdown export and AI summaries
 
 ## Installation
 
-1. Download and unzip the extension
+1. Clone or download this repository
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable **Developer mode** (toggle in top-right corner)
-4. Click **"Load unpacked"** and select the unzipped `youtube-to-text-extension` folder
+4. Click **"Load unpacked"** and select this `src/` folder
 5. The extension icon appears in your toolbar
 
 ## Usage
@@ -82,7 +82,7 @@ extracted: "2026-04-07T12:00:00.000Z"
 ## File Structure
 
 ```
-youtube-to-text-extension/
+src/
 ├── manifest.json       # Extension manifest (MV3)
 ├── background.js       # Service worker (AI summarization, settings)
 ├── content.js          # Content script (transcript extraction, inline panel)
