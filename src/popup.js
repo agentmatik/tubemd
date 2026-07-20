@@ -7,6 +7,12 @@
   let activeFormat = 'markdown';
   let searchQuery = '';
 
+  // Free vs Pro split (centralized gate lives in license.js / TMLicense):
+  //   Free = plain-text transcript view + copy/download as .txt.
+  //   Pro  = Markdown export, AI summaries, SKILL.md generation.
+  const PRO_FORMATS = ['markdown', 'summary', 'skill'];
+  let isProUser = false;
+
   // A YouTube page we can extract from: standard watch pages and Shorts.
   const isYouTubeVideoUrl = (url) =>
     !!url && (url.includes('youtube.com/watch') || url.includes('youtube.com/shorts/'));
@@ -26,7 +32,13 @@
     showState('video');
     requestVideoInfo();
     setupEventListeners();
-    checkTrialStatus();
+    applyGating();
+  });
+
+  // Keep the popup's gate in sync if the license changes elsewhere (e.g. the
+  // user activates a key in the Options page while the popup is open).
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes[TMLicense.STORE.isPro]) applyGating();
   });
 
   function showState(state) {
@@ -80,6 +92,9 @@
   function setupEventListeners() {
     document.getElementById('btn-extract').addEventListener('click', extractTranscript);
 
+    // Upgrade button in the free-plan banner -> Stripe checkout
+    document.getElementById('btn-upgrade')?.addEventListener('click', promptUpgrade);
+
     document.getElementById('btn-refresh').addEventListener('click', () => {
       transcriptData = null;
       videoMeta = null;
@@ -91,14 +106,15 @@
       chrome.runtime.openOptionsPage();
     });
 
-    // Format tabs
+    // Format tabs (Pro formats are gated for free users)
     document.querySelectorAll('.format-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        activeFormat = tab.dataset.format;
-        document.querySelectorAll('.format-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(`tab-${activeFormat}`).classList.add('active');
+        const fmt = tab.dataset.format;
+        if (!isProUser && PRO_FORMATS.includes(fmt)) {
+          promptUpgrade();
+          return;
+        }
+        setActiveTab(fmt);
         renderCurrentFormat();
       });
     });
@@ -177,9 +193,14 @@
       document.getElementById('btn-summarize').disabled = false;
       document.getElementById('btn-generate-skill').disabled = false;
 
+      // Free users land on the plain-text tab (Markdown/AI/skill are Pro). This
+      // prevents the default Markdown tab from exposing a Pro output for free.
+      if (!isProUser && PRO_FORMATS.includes(activeFormat)) {
+        setActiveTab('text');
+      }
+
       renderCurrentFormat();
       showToast(`Transcript extracted (${transcriptData.transcript.length} segments)`);
-      incrementUsageCount();
 
     } catch (err) {
       btn.textContent = 'RETRY';
@@ -284,6 +305,7 @@
   // AI SUMMARY
   // ============================================================
   async function generateSummary() {
+    if (!isProUser) { promptUpgrade(); return; }
     if (!transcriptData) { showToast('Extract transcript first.'); return; }
 
     const output = document.getElementById('summary-output');
@@ -359,6 +381,7 @@
   // SKILL GENERATION
   // ============================================================
   async function generateSkill() {
+    if (!isProUser) { promptUpgrade(); return; }
     if (!transcriptData) { showToast('Extract transcript first.'); return; }
 
     const output = document.getElementById('skill-output');
@@ -515,67 +538,70 @@
   }
 
   // ============================================================
-  // TRIAL / MONETIZATION
+  // LICENSING / PRO GATING
   // ============================================================
-  async function checkTrialStatus() {
-    const result = await chrome.storage.local.get(['trialStart', 'isPro']);
+  // One source of truth: TMLicense (license.js, loaded via <script> in
+  // popup.html). The popup reads the flag, marks Pro tabs, and routes upgrade
+  // clicks through the background worker's Stripe checkout.
 
-    if (result.isPro) {
-      document.getElementById('trial-banner').style.display = 'none';
-      return;
-    }
+  async function applyGating() {
+    isProUser = await TMLicense.isProActive();
 
-    if (!result.trialStart) {
-      await chrome.storage.local.set({ trialStart: Date.now() });
-      result.trialStart = Date.now();
-    }
-
-    const trialDays = 14;
-    const elapsed = Date.now() - result.trialStart;
-    const daysLeft = Math.max(0, trialDays - Math.floor(elapsed / (1000 * 60 * 60 * 24)));
-
-    const banner = document.getElementById('trial-banner');
-    const trialText = document.getElementById('trial-text');
-
-    if (daysLeft > 0) {
-      banner.style.display = 'flex';
-      trialText.textContent = `Free trial: ${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining`;
-    } else {
-      banner.style.display = 'flex';
-      trialText.textContent = 'Free trial expired';
-      document.getElementById('btn-upgrade').style.display = 'inline-flex';
-      gatePremiumFeatures();
-    }
-
-    document.getElementById('btn-upgrade').addEventListener('click', showUpgradeOptions);
-  }
-
-  function gatePremiumFeatures() {
-    const mdTab = document.querySelector('.format-tab[data-format="markdown"]');
-    const sumTab = document.querySelector('.format-tab[data-format="summary"]');
-    const skillTab = document.querySelector('.format-tab[data-format="skill"]');
-
-    [mdTab, sumTab, skillTab].forEach(tab => {
-      if (tab) {
-        tab.innerHTML += ' <span style="font-size:9px;color:#d97706;">PRO</span>';
-        tab.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          showUpgradeOptions();
-        }, true);
+    // Badge the Pro tabs for free users (idempotent - badge once).
+    document.querySelectorAll('.format-tab').forEach(tab => {
+      const isProTab = PRO_FORMATS.includes(tab.dataset.format);
+      const badged = tab.querySelector('.pro-badge');
+      if (isProTab && !isProUser && !badged) {
+        const b = document.createElement('span');
+        b.className = 'pro-badge';
+        b.style.cssText = 'font-size:9px;color:#d97706;margin-left:4px;';
+        b.textContent = 'PRO';
+        tab.appendChild(b);
+      } else if ((isProUser || !isProTab) && badged) {
+        badged.remove();
       }
     });
+
+    // Free users on a Pro tab get bounced to the free plain-text tab.
+    if (!isProUser && PRO_FORMATS.includes(activeFormat)) {
+      setActiveTab('text');
+      renderCurrentFormat();
+    }
+
+    // Banner: hidden for Pro; upgrade prompt for free.
+    const banner = document.getElementById('trial-banner');
+    const text = document.getElementById('trial-text');
+    const upgradeBtn = document.getElementById('btn-upgrade');
+    if (banner && text && upgradeBtn) {
+      if (isProUser) {
+        banner.style.display = 'none';
+      } else {
+        banner.style.display = 'flex';
+        text.textContent = 'Free plan: plain-text transcripts. Pro unlocks Markdown, AI summaries & skills.';
+        upgradeBtn.style.display = 'inline-flex';
+      }
+    }
   }
 
-  function showUpgradeOptions() {
-    chrome.tabs.create({ url: 'https://agentmatik.ai/tubemd-pro' });
+  function setActiveTab(fmt) {
+    activeFormat = fmt;
+    document.querySelectorAll('.format-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.format === fmt));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const pane = document.getElementById(`tab-${fmt}`);
+    if (pane) pane.classList.add('active');
   }
 
-  function incrementUsageCount() {
-    chrome.storage.local.get(['usageCount'], (result) => {
-      const count = (result.usageCount || 0) + 1;
-      chrome.storage.local.set({ usageCount: count });
-    });
+  // Upgrade: Stripe checkout via the background worker (single code path for
+  // popup, options, and inline panel). Fallback to the product page if the
+  // checkout service is unreachable.
+  async function promptUpgrade() {
+    showToast('Pro feature - opening upgrade...');
+    try {
+      const resp = await chrome.runtime.sendMessage({ action: 'startCheckout' });
+      if (resp?.success) return;
+    } catch { /* fall through to product page */ }
+    chrome.tabs.create({ url: 'https://agentmatik.ai/tubemd' });
   }
 
   // ============================================================

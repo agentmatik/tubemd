@@ -1,6 +1,13 @@
 // TubeMD - Background Service Worker
-// Handles: AI summarization, skill generation, settings storage, keyboard shortcut
-// Version: 1.0.0
+// Handles: AI summarization, skill generation, settings storage, keyboard
+// shortcut, and server-validated licensing (checkout + validate + daily
+// re-check). The service worker is the ONLY context that talks to the licensing
+// API, because a content-script fetch would be blocked by YouTube's CSP.
+// Version: 1.1.0
+
+// Shared licensing module (single source of truth for the API contract, key
+// format, and the Pro gate). Exposes globalThis.TMLicense.
+importScripts('license.js');
 
 // Network safety: bound every provider request so a hung connection surfaces
 // as an error instead of leaving the UI spinning forever.
@@ -75,6 +82,121 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         saveSettings(s).then(() => sendResponse({ success: true }));
       });
       return true;
+
+    // --- Licensing (popup + options + inline panel all route through here) ---
+    case 'startCheckout':
+      handleCheckout()
+        .then(data => sendResponse(data))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+
+    case 'validateLicense':
+      handleValidate(request.key)
+        .then(data => sendResponse(data))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+
+    case 'getLicenseState':
+      TMLicense.getLicenseState().then(state => sendResponse({ success: true, state }));
+      return true;
+
+    case 'removeLicense':
+      TMLicense.clearLicense().then(() => sendResponse({ success: true }));
+      return true;
+
+    case 'revalidateLicense':
+      handleRevalidate()
+        .then(data => sendResponse(data))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+      return true;
+  }
+});
+
+// ============================================================
+// LICENSING
+// ============================================================
+// Open a Stripe-hosted checkout. Fetch the URL server-side, then open the tab
+// from here (content scripts have no tabs access; opening from the worker keeps
+// one code path for popup, options, and the inline panel).
+async function handleCheckout() {
+  const url = await TMLicense.requestCheckoutUrl();
+  await chrome.tabs.create({ url });
+  return { success: true, url };
+}
+
+// Activate a pasted key. Format-check locally first (no wasted round-trip on an
+// obvious typo), then validate against the Worker.
+async function handleValidate(rawKey) {
+  const key = TMLicense.normalizeKey(rawKey);
+  if (!TMLicense.isValidKeyFormat(key)) {
+    return { success: false, error: 'That does not look like a TubeMD key. The format is TM-XXXX-XXXX-XXXX.' };
+  }
+
+  const data = await TMLicense.requestValidate(key);
+
+  if (data.valid === true && data.product === TMLicense.PRODUCT) {
+    await TMLicense.setValidated(key, data.plan);
+    return { success: true, valid: true, plan: data.plan || 'pro' };
+  }
+
+  // Explicitly rejected, or valid for a different product: do not grant Pro.
+  const reason = data.reason || (data.product && data.product !== TMLicense.PRODUCT ? 'wrong_product' : 'invalid');
+  await TMLicense.setInvalid(key, reason);
+  return { success: true, valid: false, reason };
+}
+
+// Periodic + startup re-check of the stored key.
+// fail-CLOSED only on an explicit valid:false with reason revoked/expired.
+// On a network error (or any ambiguous response) KEEP the last-known Pro state,
+// so a paying user is never locked out while offline or during a backend blip.
+async function handleRevalidate() {
+  const state = await TMLicense.getLicenseState();
+  if (!state.licenseKey) return { success: true, skipped: 'no-key' };
+
+  let data;
+  try {
+    data = await TMLicense.requestValidate(state.licenseKey);
+  } catch (err) {
+    // Network/timeout: keep last-known state.
+    return { success: false, error: err.message, kept: true };
+  }
+
+  if (data.valid === false && (data.reason === 'revoked' || data.reason === 'expired')) {
+    await TMLicense.setInvalid(state.licenseKey, data.reason);
+    return { success: true, valid: false, reason: data.reason };
+  }
+
+  if (data.valid === true && data.product === TMLicense.PRODUCT) {
+    await TMLicense.setValidated(state.licenseKey, data.plan || state.licensePlan);
+    return { success: true, valid: true };
+  }
+
+  // Anything else (ok:false, valid:false with a soft reason, malformed): keep
+  // the last-known state rather than risk locking out a paying user.
+  return { success: true, kept: true };
+}
+
+// Re-validate on install, browser startup, and once a day via an alarm
+// (alarms survive service-worker termination; setInterval would not).
+const LICENSE_ALARM = 'tubemd-license-revalidate';
+
+function ensureLicenseAlarm() {
+  chrome.alarms.create(LICENSE_ALARM, { periodInMinutes: 1440 });
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  ensureLicenseAlarm();
+  handleRevalidate().catch(() => { /* keep last-known state */ });
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  ensureLicenseAlarm();
+  handleRevalidate().catch(() => { /* keep last-known state */ });
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === LICENSE_ALARM) {
+    handleRevalidate().catch(() => { /* keep last-known state */ });
   }
 });
 

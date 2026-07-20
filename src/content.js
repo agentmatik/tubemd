@@ -817,6 +817,11 @@
   // INLINE AI SUMMARY
   // ============================================================
   async function generateSummaryInline() {
+    if (!(await panelIsPro())) {
+      showToast('AI summaries are a Pro feature - opening upgrade...');
+      promptUpgradeInline();
+      return;
+    }
     if (!transcriptData?.transcript) { showToast('Load transcript first.'); return; }
     const contentEl = document.getElementById('ytt-summary-content');
     contentEl.innerHTML = `<div class="ytt-placeholder"><div class="ytt-spinner spinning"></div><p>Generating AI summary...</p></div>`;
@@ -873,29 +878,62 @@
   // ============================================================
   // INLINE COPY & DOWNLOAD
   // ============================================================
-  function copyTranscriptInline() {
+  // ── Pro gating (inline panel) ─────────────────────────────
+  // Same single gate as the popup and options: TMLicense (license.js loads
+  // before this file per manifest content_scripts order). The panel was
+  // historically ungated - that gap is closed here: free tier gets plain-text
+  // copy/download, Pro gets Markdown + AI summaries.
+
+  function panelIsPro() {
+    return TMLicense.isProActive();
+  }
+
+  // Content scripts cannot open tabs; the background worker starts the Stripe
+  // checkout and opens it. Fallback: product page via window.open.
+  async function promptUpgradeInline() {
+    try {
+      const resp = await chrome.runtime.sendMessage({ action: 'startCheckout' });
+      if (resp?.success) return;
+    } catch { /* fall through */ }
+    window.open('https://agentmatik.ai/tubemd', '_blank', 'noopener');
+  }
+
+  function generateInlinePlainText() {
+    return transcriptData.transcript
+      .map(item => `[${formatTime(item.start)}] ${item.text}`)
+      .join('\n');
+  }
+
+  async function copyTranscriptInline() {
     if (!transcriptData?.transcript) { showToast('No transcript loaded.'); return; }
-    // Copy as Markdown with frontmatter
-    const md = generateInlineMarkdown();
-    navigator.clipboard.writeText(md)
-      .then(() => showToast('Copied as Markdown!'))
+    const pro = await panelIsPro();
+    const content = pro ? generateInlineMarkdown() : generateInlinePlainText();
+    navigator.clipboard.writeText(content)
+      .then(() => showToast(pro
+        ? 'Copied as Markdown!'
+        : 'Copied as plain text. Markdown export is a Pro feature.'))
       .catch(() => showToast('Failed to copy.'));
   }
 
-  function downloadTranscriptInline() {
+  async function downloadTranscriptInline() {
     if (!transcriptData?.transcript) { showToast('No transcript loaded.'); return; }
-    const md = generateInlineMarkdown();
+    const pro = await panelIsPro();
+    const content = pro ? generateInlineMarkdown() : generateInlinePlainText();
+    const ext = pro ? 'md' : 'txt';
+    const mime = pro ? 'text/markdown' : 'text/plain';
     const title = transcriptData.videoTitle || 'transcript';
-    const blob = new Blob([md], { type: 'text/markdown' });
+    const blob = new Blob([content], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${sanitizeFilename(title)}.md`;
+    a.download = `${sanitizeFilename(title)}.${ext}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('Downloaded as .md!');
+    showToast(pro
+      ? 'Downloaded as .md!'
+      : 'Downloaded as .txt. Markdown export is a Pro feature.');
   }
 
   function generateInlineMarkdown() {

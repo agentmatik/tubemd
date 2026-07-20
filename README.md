@@ -111,11 +111,15 @@ No backend, no telemetry, no tracking. Transcripts are processed locally and are
 sent to a third-party AI provider only when you explicitly ask for a summary or
 skill, under your own key. Read the full policy in [PRIVACY.md](PRIVACY.md).
 
-## Trial / Pro (prototype)
+## Free vs Pro
 
-The build includes a licensing scaffold: a 14-day trial, then a Pro upgrade
-gating Markdown export and AI summaries. This is a prototype to validate, not a
-finalized model, and it is enforced only in the popup UI.
+Free: transcript extraction with plain-text view, copy, and .txt download - in
+both the inline panel and the popup. Pro (one-time $49, lifetime): Markdown
+export with YAML frontmatter, AI summaries, and SKILL.md generation. Payment
+runs through Stripe Checkout in a new tab; the license key (TM-XXXX-XXXX-XXXX)
+is validated server-side against the Agentmatik Licensing API and re-checked
+daily (network failures never lock out a paying user; only an explicit
+revoked/expired downgrades).
 
 ## Development
 
@@ -125,4 +129,6 @@ matrix. Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-[MIT](LICENSE) - Copyright (c) 2026 Agentmatik.
+Proprietary - (c) 2026 Agentmatik s.r.o. All rights reserved. See [LICENSE](LICENSE).
+The packaged extension is free to install; Pro features require a one-time license.
+The source may not be copied, redistributed, or sold.
