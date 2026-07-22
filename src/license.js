@@ -29,7 +29,7 @@
   // "Agentmatik Licensing API" (repo agentmatik/skool-downloader/api) is live.
   // If you change the host, also update host_permissions in manifest.json and
   // the disclosure in PRIVACY.md / STORE.md.
-  const LICENSING_API = 'https://licensing.agentmatik.ai';
+  const LICENSING_API = 'https://agentmatik-licensing.wintabear.workers.dev';
 
   // This extension's product id in the shared Worker.
   const PRODUCT = 'tubemd';
