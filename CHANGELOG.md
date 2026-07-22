@@ -4,6 +4,40 @@ All notable changes to TubeMD are documented here. This project follows
 [Semantic Versioning](https://semver.org/) and the format of
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-07-06 - Server-validated licensing + Stripe checkout
+
+### Added
+
+- **Server-validated Pro licensing** replacing the client-only 14-day trial:
+  shared `src/license.js` module (`TMLicense`) is the single Pro gate for
+  popup, options, AND the inline panel - closing the historical gap where the
+  panel was ungated. Keys (`TM-XXXX-XXXX-XXXX`) validate against the Agentmatik
+  Licensing API with daily re-checks via `chrome.alarms` (network failures keep
+  last-known state; only explicit revoked/expired downgrades).
+- **Stripe checkout**: "Get Pro - $49 lifetime" in options, popup banner, and
+  panel upgrade prompts route through the background worker (`startCheckout`),
+  which opens a Stripe-hosted checkout tab (https-only URL guard).
+- **Free tier is now honest and useful**: plain-text transcript view, copy,
+  and .txt download everywhere; Markdown/AI/skill are Pro.
+- Production scaffolding: GitHub Actions CI (syntax + manifest), issue/PR
+  templates, SECURITY.md, CODEOWNERS, STORE.md dossier.
+
+### Changed
+
+- **License: MIT -> proprietary** (commercial freemium product).
+- Options license section rebuilt: key activation, purchase, remove-license,
+  revocation/expiry reasons; fully static innerHTML + textContent rendering.
+- `manifest.json` 1.1.0: adds `alarms` permission + licensing host;
+  `license.js` loads before `content.js`; popup/options load it via script tag.
+- PRIVACY.md: discloses the licensing API call (the only Agentmatik-bound
+  data) and purchase-email retention; README Free-vs-Pro section.
+
+### Removed
+
+- Trial-period logic (`trialStart`, popup trial banner countdown,
+  `incrementUsageCount`) and the dead `https://agentmatik.ai/tubemd-pro` links.
+
+
 ## [Unreleased]
 
 ### Security
