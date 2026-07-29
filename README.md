@@ -114,7 +114,7 @@ skill, under your own key. Read the full policy in [PRIVACY.md](PRIVACY.md).
 ## Free vs Pro
 
 Free: transcript extraction with plain-text view, copy, and .txt download - in
-both the inline panel and the popup. Pro (one-time $49, lifetime): Markdown
+both the inline panel and the popup. Pro ($1.99/month or $19/year): Markdown
 export with YAML frontmatter, AI summaries, and SKILL.md generation. Payment
 runs through Stripe Checkout in a new tab; the license key (TM-XXXX-XXXX-XXXX)
 is validated server-side against the Agentmatik Licensing API and re-checked
@@ -130,5 +130,5 @@ matrix. Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 ## License
 
 Proprietary - (c) 2026 Agentmatik s.r.o. All rights reserved. See [LICENSE](LICENSE).
-The packaged extension is free to install; Pro features require a one-time license.
+The packaged extension is free to install; Pro features require an active subscription license.
 The source may not be copied, redistributed, or sold.

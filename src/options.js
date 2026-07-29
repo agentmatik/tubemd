@@ -113,7 +113,7 @@
   const LICENSE_HTML_PRO = `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <span style="background:#34c759;color:#fff;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;">PRO</span>
-      <span style="font-size:14px;font-weight:600;">Licensed - lifetime</span>
+      <span style="font-size:14px;font-weight:600;">Licensed - Pro active</span>
     </div>
     <p class="section-desc">Key: <code id="lic-key-shown"></code></p>
     <p class="section-desc">Markdown export, AI summaries, and SKILL.md generation are unlocked. Thank you for your support!</p>
@@ -126,12 +126,12 @@
       <span style="font-size:14px;font-weight:600;">Plain-text transcripts</span>
     </div>
     <p id="lic-reason" class="section-desc" style="color:#ff3b30;"></p>
-    <p class="section-desc">Pro (one-time $49, lifetime) unlocks Markdown export with YAML frontmatter, AI summaries, and SKILL.md generation.</p>
+    <p class="section-desc">Pro ($1.99/month or $19/year, cancel anytime) unlocks Markdown export with YAML frontmatter, AI summaries, and SKILL.md generation.</p>
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
       <input type="text" id="lic-input" placeholder="TM-XXXX-XXXX-XXXX" maxlength="17"
              style="flex:1;min-width:180px;padding:10px;border:1px solid #d2d2d7;border-radius:8px;font-family:monospace;" />
       <button id="lic-activate" class="btn-primary">Activate</button>
-      <button id="lic-buy" class="btn-primary" style="background:#e74c6f;">Get Pro - $49 lifetime</button>
+      <button id="lic-buy" class="btn-primary" style="background:#e74c6f;">Get Pro - $1.99/month</button>
     </div>
     <p id="lic-msg" class="section-desc" style="margin-top:8px;min-height:16px;"></p>
   `;

@@ -16,7 +16,7 @@ Internal document: listing content + reviewer-facing justifications.
   timestamp to seek, and copy or download the result.
 
   Free: plain-text transcripts (view, copy, .txt download).
-  Pro (one-time purchase, lifetime): Markdown export with YAML frontmatter,
+  Pro (subscription, $1.99/month or $19/year): Markdown export with YAML frontmatter,
   AI summaries via Google Gemini, OpenAI, or Anthropic Claude using YOUR OWN
   API key, and SKILL.md generation for AI agents.
 

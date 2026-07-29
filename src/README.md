@@ -101,7 +101,7 @@ src/
 
 - **Free Trial:** 14-day full access to all features
 - **After Trial:** Plain text transcript remains free; Markdown export and AI summaries require Pro
-- **Pro Pricing:** $49 lifetime (one-time payment)
+- **Pro Pricing:** $1.99/month or $19/year (subscription)
 
 ## Contact
 
