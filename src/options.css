@@ -1,4 +1,34 @@
-/* TubeMD Options Page Styles */
+/* TubeMD Options - Agentmatik Product Pass design system (v2.0, July 2026)
+   Tokens inlined from brand/tokens/web/tokens.css - self-contained, no remote
+   CSS/fonts. Brand fonts fall back to system faces when not installed. */
+
+:root {
+  --am-cream: #FBF0E0;
+  --am-peach-panel: #F5CFA4;
+  --am-cream-deep: #F4E3CB;
+  --am-ink: #0F0F0F;
+  --am-body: #57503F;
+  --am-body-strong: #3A352B;
+  --am-muted: #8A8172;
+  --am-accent-text: #8A5A23;
+  --am-orange: #F39340;
+  --am-deep-orange: #D96A1E;
+  --am-white: #FFFFFF;
+  --am-ok: #3F8A56;
+  --am-error: #B43A28;
+
+  --am-font-display: 'Bricolage Grotesque', 'Instrument Sans', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --am-font-body: 'Instrument Sans', -apple-system, 'Segoe UI', system-ui, ui-sans-serif, sans-serif;
+  --am-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --am-border: 2px solid var(--am-ink);
+  --am-radius-card: 16px;
+  --am-radius-tile: 12px;
+  --am-radius-pill: 9999px;
+
+  --am-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --am-dur: 150ms;
+}
 
 * {
   box-sizing: border-box;
@@ -7,10 +37,16 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f5f5f7;
-  color: #1d1d1f;
+  font-family: var(--am-font-body);
+  background: var(--am-cream);
+  color: var(--am-ink);
   line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--am-deep-orange);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .options-container {
@@ -19,11 +55,9 @@ body {
   padding: 40px 24px;
 }
 
-/* Header */
+/* Header - shared Agentmatik header pattern */
 .options-header {
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 28px;
 }
 
 .brand {
@@ -33,47 +67,63 @@ body {
 }
 
 .brand-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--am-radius-tile);
 }
 
 .brand h1 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1d1d1f;
+  font-family: var(--am-font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--am-ink);
   margin: 0;
+  line-height: 1.1;
+}
+
+.brand-wordmark {
+  font-family: var(--am-font-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+  color: var(--am-accent-text);
 }
 
 .version {
-  font-size: 12px;
-  color: #86868b;
+  font-family: var(--am-font-mono);
+  font-size: 11px;
+  color: var(--am-muted);
   font-weight: 500;
+  margin-left: 8px;
 }
 
-/* Sections */
+/* Sections - white 2px-ink cards */
 .settings-section {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--am-white);
+  border: var(--am-border);
+  border-radius: var(--am-radius-card);
   padding: 24px;
   margin-bottom: 16px;
-  border: 1px solid #e5e5e7;
 }
 
 .settings-section h2 {
-  font-size: 17px;
-  font-weight: 600;
+  font-family: var(--am-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   margin-bottom: 6px;
-  color: #1d1d1f;
+  color: var(--am-ink);
 }
 
 .section-desc {
   font-size: 13px;
-  color: #86868b;
+  color: var(--am-body);
   margin-bottom: 16px;
 }
 
-/* Provider Selector */
+/* Provider Selector - ink-bordered tiles, peach when selected */
 .provider-selector {
   display: flex;
   gap: 10px;
@@ -86,38 +136,51 @@ body {
 }
 
 .provider-option input[type="radio"] {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .provider-card {
-  padding: 14px;
-  border: 2px solid #e5e5e7;
-  border-radius: 10px;
+  padding: 14px 10px;
+  border: var(--am-border);
+  border-radius: var(--am-radius-tile);
+  background: var(--am-white);
   text-align: center;
-  transition: all 0.2s;
+  transition: transform var(--am-dur) var(--am-ease), background-color var(--am-dur) var(--am-ease);
+}
+
+.provider-option:hover .provider-card {
+  transform: translateY(-2px);
 }
 
 .provider-option input:checked + .provider-card {
-  border-color: #e74c6f;
-  background: #fef2f4;
+  background: var(--am-peach-panel);
+}
+
+.provider-option input:focus-visible + .provider-card {
+  outline: 2px solid var(--am-deep-orange);
+  outline-offset: 2px;
 }
 
 .provider-name {
+  font-family: var(--am-font-display);
   font-size: 13px;
-  font-weight: 600;
-  color: #1d1d1f;
+  font-weight: 700;
+  color: var(--am-ink);
   margin-bottom: 2px;
 }
 
 .provider-model {
-  font-size: 11px;
-  color: #86868b;
-  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 10px;
+  color: var(--am-body);
+  font-family: var(--am-font-mono);
 }
 
 .provider-note {
+  font-family: var(--am-font-mono);
   font-size: 10px;
-  color: #34c759;
+  color: var(--am-ok);
   font-weight: 500;
   margin-top: 4px;
 }
@@ -126,13 +189,13 @@ body {
 .api-key-section {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid rgba(15, 15, 15, 0.1);
 }
 
 .api-key-section label {
   font-size: 13px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--am-ink);
   display: block;
   margin-bottom: 6px;
 }
@@ -144,47 +207,54 @@ body {
 
 .key-row input {
   flex: 1;
+  min-height: 40px;
   padding: 10px 14px;
-  border: 1px solid #d2d2d7;
-  border-radius: 8px;
+  border: var(--am-border);
+  border-radius: 10px;
   font-size: 13px;
+  background: var(--am-white);
+  color: var(--am-ink);
   outline: none;
-  transition: border-color 0.2s;
-  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-family: var(--am-font-mono);
 }
 
+.key-row input::placeholder { color: var(--am-body); }
+
 .key-row input:focus {
-  border-color: #e74c6f;
+  outline: 2px solid var(--am-deep-orange);
+  outline-offset: 2px;
 }
 
 .btn-toggle-vis {
-  background: none;
-  border: 1px solid #d2d2d7;
-  border-radius: 8px;
+  background: var(--am-white);
+  border: var(--am-border);
+  border-radius: 10px;
+  min-width: 40px;
   padding: 8px 10px;
   cursor: pointer;
-  color: #86868b;
-  transition: all 0.2s;
+  color: var(--am-body-strong);
+  transition: transform var(--am-dur) var(--am-ease), color var(--am-dur) var(--am-ease);
 }
 
 .btn-toggle-vis:hover {
-  background: #f0f0f0;
-  color: #1d1d1f;
+  transform: translateY(-2px);
+  color: var(--am-ink);
 }
 
 .key-hint {
-  font-size: 11px;
-  color: #86868b;
+  font-size: 12px;
+  color: var(--am-body);
   margin-top: 6px;
 }
 
 .key-hint a {
-  color: #e74c6f;
-  text-decoration: none;
+  color: var(--am-deep-orange);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .key-hint a:hover {
-  text-decoration: underline;
+  color: var(--am-accent-text);
 }
 
 /* Format Selector */
@@ -198,33 +268,48 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 44px;
   padding: 10px 14px;
-  border: 1px solid #e5e5e7;
-  border-radius: 8px;
+  border: var(--am-border);
+  border-radius: var(--am-radius-tile);
+  background: var(--am-white);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color var(--am-dur) var(--am-ease);
   font-size: 13px;
+  color: var(--am-body-strong);
 }
 
 .format-option:hover {
-  background: #fafafa;
+  background: var(--am-cream);
+}
+
+.format-option:has(input:checked) {
+  background: var(--am-peach-panel);
+}
+
+.format-option input[type="radio"] {
+  accent-color: var(--am-orange);
 }
 
 .format-option input:checked ~ span:first-of-type {
   font-weight: 600;
+  color: var(--am-ink);
 }
 
 .format-badge {
-  font-size: 10px;
+  font-family: var(--am-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 600;
+  border: 2px solid currentColor;
+  border-radius: var(--am-radius-pill);
   margin-left: auto;
 }
 
 .format-badge.recommended {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: transparent;
+  color: var(--am-ok);
 }
 
 /* Contact */
@@ -238,17 +323,19 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #e74c6f;
-  text-decoration: none;
+  color: var(--am-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
   font-size: 14px;
   font-weight: 500;
 }
 
 .contact-link:hover {
-  text-decoration: underline;
+  color: var(--am-deep-orange);
 }
 
-/* Save Bar */
+/* Save Bar - liquid orange pill (Product Pass §10) */
 .save-bar {
   display: flex;
   align-items: center;
@@ -257,24 +344,34 @@ body {
 }
 
 .btn-save {
-  background: #1d1d1f;
-  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.06) 55%),
+    rgba(243, 147, 64, 0.62);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  backdrop-filter: blur(16px) saturate(1.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 4px 14px rgba(217, 106, 30, 0.3);
+  color: var(--am-ink);
   border: none;
+  min-height: 44px;
   padding: 12px 32px;
-  border-radius: 10px;
+  border-radius: var(--am-radius-pill);
+  font-family: var(--am-font-display);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform var(--am-dur) var(--am-ease), box-shadow var(--am-dur) var(--am-ease);
 }
 
 .btn-save:hover {
-  background: #333;
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65), 0 6px 18px rgba(217, 106, 30, 0.38);
 }
+
+.btn-save:active { transform: translateY(0); }
 
 .save-status {
   font-size: 13px;
-  color: #34c759;
+  color: var(--am-ok);
   font-weight: 500;
 }
 
@@ -282,20 +379,30 @@ body {
 .options-footer {
   margin-top: 32px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
   text-align: center;
 }
 
 .options-footer p {
   font-size: 12px;
-  color: #86868b;
+  color: var(--am-body);
 }
 
 .options-footer a {
-  color: #e74c6f;
-  text-decoration: none;
+  color: var(--am-deep-orange);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .options-footer a:hover {
-  text-decoration: underline;
+  color: var(--am-accent-text);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .btn-save:hover, .btn-toggle-vis:hover, .provider-option:hover .provider-card { transform: none; }
 }

@@ -4,6 +4,30 @@ All notable changes to TubeMD are documented here. This project follows
 [Semantic Versioning](https://semver.org/) and the format of
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] - Agentmatik Product Pass brand alignment
+
+### Changed
+
+- **Full UI restyle to the Agentmatik Product Pass design system** (CSS-only;
+  no JS, ids, or message flows touched): cream `#FBF0E0` canvas, white cards
+  with 2px ink borders (16px radius), liquid-orange glass primary buttons and
+  white glass secondary pills/chips per the July 2026 glass-system amendments,
+  JetBrains Mono labels/chips, warm status colors (`#3F8A56` ok / `#B43A28`
+  error). Applies to the popup (`src/popup.css`), options page
+  (`src/options.css`), and the inline YouTube panel (`src/content.css` -
+  previously dark navy/pink, now a cream branded island that reads on both
+  YouTube themes; the "agentmatik" wordmark is added via a CSS `::after` so
+  `content.js` stays untouched).
+- Shared Agentmatik header pattern: product name in the display face with a
+  small lowercase "agentmatik" wordmark beneath (popup + options HTML gain a
+  wordmark `<span>`; all load-bearing ids/classes unchanged).
+- Typography: brand stacks (`Bricolage Grotesque` display, `Instrument Sans`
+  body, `JetBrains Mono` code) with system fallbacks - extensions cannot load
+  remote fonts and no font files are bundled.
+- Accessibility: visible `:focus-visible` rings (deep-orange, 2px),
+  `prefers-reduced-motion` disables all transforms/animations, tap targets
+  32px+, WCAG AA contrast on all text roles.
+
 ## [1.1.0] - 2026-07-06 - Server-validated licensing + Stripe checkout
 
 ### Added
