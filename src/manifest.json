@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TubeMD - YouTube to Markdown Transcript",
   "version": "1.1.0",
-  "description": "Extract YouTube transcripts as clean Markdown with YAML frontmatter, optimized for AI agents. Supports Gemini, ChatGPT & Claude summaries.",
+  "description": "Extract YouTube transcripts as clean Markdown with YAML frontmatter. Optional AI summaries with your own API key.",
   "permissions": [
     "activeTab",
     "storage",
@@ -13,8 +13,7 @@
     "https://www.youtube.com/*",
     "https://generativelanguage.googleapis.com/*",
     "https://api.openai.com/*",
-    "https://api.anthropic.com/*",
-    "https://licensing.agentmatik.ai/*"
+    "https://api.anthropic.com/*"
   ],
   "action": {
     "default_icon": {
@@ -31,8 +30,13 @@
         "*://*.youtube.com/watch*",
         "*://*.youtube.com/shorts/*"
       ],
-      "js": ["license.js", "content.js"],
-      "css": ["content.css"],
+      "js": [
+        "license.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
