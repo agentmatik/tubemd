@@ -13,7 +13,7 @@
         <img src="icons/icon48.png" alt="TubeMD" class="brand-icon">
         <div>
           <h1>TubeMD</h1>
-          <span class="brand-wordmark">agentmatik</span><span class="version">v1.0.0</span>
+          <span class="brand-wordmark">agentmatik</span><span class="version">v2.0.0</span>
         </div>
       </div>
     </header>
@@ -21,7 +21,7 @@
     <!-- AI Provider Settings -->
     <section class="settings-section">
       <h2>AI Summary Provider</h2>
-      <p class="section-desc">Choose which AI model to use for generating video summaries. You need to provide your own API key.</p>
+      <p class="section-desc">Choose which AI model to use for summaries and SKILL.md generation. You bring your own API key - it is stored on this device only and sent only to the provider you pick.</p>
 
       <div class="provider-selector">
         <label class="provider-option">
@@ -102,14 +102,6 @@
       </div>
     </section>
 
-    <!-- Trial / License -->
-    <section class="settings-section">
-      <h2>License</h2>
-      <div id="license-info">
-        <p class="section-desc">Loading license status...</p>
-      </div>
-    </section>
-
     <!-- Contact -->
     <section class="settings-section">
       <h2>Contact & Support</h2>
@@ -118,6 +110,10 @@
         <a href="mailto:hello@agentmatik.ai" class="contact-link">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           hello@agentmatik.ai
+        </a>
+        <a href="https://github.com/agentmatik/tubemd/issues" target="_blank" class="contact-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Report an issue on GitHub
         </a>
       </div>
     </section>
@@ -129,11 +125,10 @@
     </div>
 
     <footer class="options-footer">
-      <p>TubeMD v1.0.0 - Built by <a href="https://agentmatik.ai" target="_blank">Agentmatik</a></p>
+      <p>TubeMD v2.0.0 - free and open source (MIT) - built by <a href="https://agentmatik.ai" target="_blank">Agentmatik</a> - <a href="https://github.com/agentmatik/tubemd" target="_blank">source on GitHub</a></p>
     </footer>
   </div>
 
-  <script src="license.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
 //   3. Respond to messages from popup.js
 //   4. Extract video metadata for Markdown frontmatter
 //
-// Version: 1.0.0
+// Version: 2.0.0
 
 (function () {
   'use strict';
@@ -269,6 +269,7 @@
       headers = { 'Content-Type': 'application/json' };
     }
 
+    // Fallback: YouTube's public InnerTube web-client key (every youtube.com page ships it) - not a secret.
     const apiKey = getPageInnerTubeConfig().apiKey || 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
     const url = `https://www.youtube.com/youtubei/v1/player?key=${apiKey}&prettyPrint=false`;
 
@@ -817,11 +818,6 @@
   // INLINE AI SUMMARY
   // ============================================================
   async function generateSummaryInline() {
-    if (!(await panelIsPro())) {
-      showToast('AI summaries are a Pro feature - opening upgrade...');
-      promptUpgradeInline();
-      return;
-    }
     if (!transcriptData?.transcript) { showToast('Load transcript first.'); return; }
     const contentEl = document.getElementById('ytt-summary-content');
     contentEl.innerHTML = `<div class="ytt-placeholder"><div class="ytt-spinner spinning"></div><p>Generating AI summary...</p></div>`;
@@ -878,62 +874,29 @@
   // ============================================================
   // INLINE COPY & DOWNLOAD
   // ============================================================
-  // ── Pro gating (inline panel) ─────────────────────────────
-  // Same single gate as the popup and options: TMLicense (license.js loads
-  // before this file per manifest content_scripts order). The panel was
-  // historically ungated - that gap is closed here: free tier gets plain-text
-  // copy/download, Pro gets Markdown + AI summaries.
+  // The inline panel always exports Markdown with YAML frontmatter. The popup
+  // offers the plain-text variant via its TEXT tab.
 
-  function panelIsPro() {
-    return TMLicense.isProActive();
-  }
-
-  // Content scripts cannot open tabs; the background worker starts the Stripe
-  // checkout and opens it. Fallback: product page via window.open.
-  async function promptUpgradeInline() {
-    try {
-      const resp = await chrome.runtime.sendMessage({ action: 'startCheckout' });
-      if (resp?.success) return;
-    } catch { /* fall through */ }
-    window.open('https://agentmatik.ai/tubemd', '_blank', 'noopener');
-  }
-
-  function generateInlinePlainText() {
-    return transcriptData.transcript
-      .map(item => `[${formatTime(item.start)}] ${item.text}`)
-      .join('\n');
-  }
-
-  async function copyTranscriptInline() {
+  function copyTranscriptInline() {
     if (!transcriptData?.transcript) { showToast('No transcript loaded.'); return; }
-    const pro = await panelIsPro();
-    const content = pro ? generateInlineMarkdown() : generateInlinePlainText();
-    navigator.clipboard.writeText(content)
-      .then(() => showToast(pro
-        ? 'Copied as Markdown!'
-        : 'Copied as plain text. Markdown export is a Pro feature.'))
+    navigator.clipboard.writeText(generateInlineMarkdown())
+      .then(() => showToast('Copied as Markdown!'))
       .catch(() => showToast('Failed to copy.'));
   }
 
-  async function downloadTranscriptInline() {
+  function downloadTranscriptInline() {
     if (!transcriptData?.transcript) { showToast('No transcript loaded.'); return; }
-    const pro = await panelIsPro();
-    const content = pro ? generateInlineMarkdown() : generateInlinePlainText();
-    const ext = pro ? 'md' : 'txt';
-    const mime = pro ? 'text/markdown' : 'text/plain';
     const title = transcriptData.videoTitle || 'transcript';
-    const blob = new Blob([content], { type: mime });
+    const blob = new Blob([generateInlineMarkdown()], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${sanitizeFilename(title)}.${ext}`;
+    a.download = `${sanitizeFilename(title)}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(pro
-      ? 'Downloaded as .md!'
-      : 'Downloaded as .txt. Markdown export is a Pro feature.');
+    showToast('Downloaded as .md!');
   }
 
   function generateInlineMarkdown() {

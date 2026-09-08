@@ -1,0 +1,17 @@
+# gitleaks configuration for TubeMD.
+#
+# Extends the default ruleset and allowlists exactly ONE literal: YouTube's
+# public InnerTube web-client API key. Every youtube.com page ships this key to
+# anonymous visitors (it is how the site's own frontend calls /youtubei/v1/*),
+# so it is public by design, cannot be rotated by us, and grants nothing.
+# src/content.js keeps it only as a fallback for when the page's own
+# INNERTUBE_API_KEY cannot be read. Everything else is scanned normally.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "YouTube public InnerTube web-client key (not a secret) - extraction fallback in src/content.js"
+regexes = [
+  '''AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8''',
+]
