@@ -1,13 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "TubeMD - YouTube to Markdown Transcript",
-  "version": "1.1.0",
-  "description": "Extract YouTube transcripts as clean Markdown with YAML frontmatter. Optional AI summaries with your own API key.",
+  "name": "TubeMD - YouTube transcripts to Markdown",
+  "version": "2.0.0",
+  "description": "Turn any YouTube video into agent-ready Markdown and skills - in your browser, with your keys",
   "permissions": [
     "activeTab",
     "storage",
-    "scripting",
-    "alarms"
+    "scripting"
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
@@ -31,7 +30,6 @@
         "*://*.youtube.com/shorts/*"
       ],
       "js": [
-        "license.js",
         "content.js"
       ],
       "css": [

@@ -4,29 +4,66 @@ All notable changes to TubeMD are documented here. This project follows
 [Semantic Versioning](https://semver.org/) and the format of
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] - Agentmatik Product Pass brand alignment
+## [2.0.0] - 2026-09-09 - Free and open source
+
+TubeMD is now free and open source under the MIT license. Every feature is
+available to everyone: plain-text export, Markdown with YAML frontmatter, AI
+summaries with your own key, and SKILL.md generation. Nothing in the extension
+contacts an Agentmatik server any more.
 
 ### Changed
 
-- **Full UI restyle to the Agentmatik Product Pass design system** (CSS-only;
-  no JS, ids, or message flows touched): cream `#FBF0E0` canvas, white cards
-  with 2px ink borders (16px radius), liquid-orange glass primary buttons and
-  white glass secondary pills/chips per the July 2026 glass-system amendments,
-  JetBrains Mono labels/chips, warm status colors (`#3F8A56` ok / `#B43A28`
-  error). Applies to the popup (`src/popup.css`), options page
-  (`src/options.css`), and the inline YouTube panel (`src/content.css` -
-  previously dark navy/pink, now a cream branded island that reads on both
-  YouTube themes; the "agentmatik" wordmark is added via a CSS `::after` so
-  `content.js` stays untouched).
-- Shared Agentmatik header pattern: product name in the display face with a
-  small lowercase "agentmatik" wordmark beneath (popup + options HTML gain a
-  wordmark `<span>`; all load-bearing ids/classes unchanged).
-- Typography: brand stacks (`Bricolage Grotesque` display, `Instrument Sans`
-  body, `JetBrains Mono` code) with system fallbacks - extensions cannot load
-  remote fonts and no font files are bundled.
-- Accessibility: visible `:focus-visible` rings (deep-orange, 2px),
-  `prefers-reduced-motion` disables all transforms/animations, tap targets
-  32px+, WCAG AA contrast on all text roles.
+- **License: proprietary -> MIT** (copyright 2026 Agentmatik s.r.o.). `LICENSE`
+  replaced with the MIT text.
+- **Manifest 2.0.0**: name "TubeMD - YouTube transcripts to Markdown", the
+  description is the new tagline, the `alarms` permission is dropped (it only
+  served the daily license re-check), and `license.js` is no longer loaded.
+- **Inline panel copy/download export Markdown again** (as in 1.0.0); the popup
+  keeps both the MARKDOWN and TEXT tabs, so plain text is still one click away.
+- Docs rewritten for a public audience: README (why it exists, "feed your own
+  brain", install, privacy, development), PRIVACY (no licensing data flow; only
+  `youtube.com` and the chosen AI provider are ever contacted), STORE (free
+  listing, monetization section removed), CONTRIBUTING, SECURITY, PR template;
+  `src/README.md` reduced to a pointer.
+- Options page: footer links to the GitHub repository and the contact section
+  gains a "Report an issue on GitHub" link; the provider description says where
+  the key lives.
+- UI restyle to the Agentmatik Product Pass design system (merged 2026-07 as
+  PR #3, first shipped in this release; previously listed as Unreleased).
+  CSS-only - no JS, ids, or message flows touched:
+  - Cream `#FBF0E0` canvas, white cards with 2px ink borders (16px radius),
+    liquid-orange glass primary buttons and white glass secondary pills/chips
+    per the July 2026 glass-system amendments, JetBrains Mono labels/chips,
+    warm status colors (`#3F8A56` ok / `#B43A28` error). Applies to the popup
+    (`src/popup.css`), options page (`src/options.css`), and the inline
+    YouTube panel (`src/content.css` - previously dark navy/pink, now a cream
+    branded island that reads on both YouTube themes; the "agentmatik"
+    wordmark is added via a CSS `::after` so `content.js` stays untouched).
+  - Shared Agentmatik header pattern: product name in the display face with a
+    small lowercase "agentmatik" wordmark beneath (popup + options HTML gain a
+    wordmark `<span>`; all load-bearing ids/classes unchanged).
+  - Typography: brand stacks (`Bricolage Grotesque` display, `Instrument Sans`
+    body, `JetBrains Mono` code) with system fallbacks - extensions cannot load
+    remote fonts and no font files are bundled.
+  - Accessibility: visible `:focus-visible` rings (deep-orange, 2px),
+    `prefers-reduced-motion` disables all transforms/animations, tap targets
+    32px+, WCAG AA contrast on all text roles.
+
+### Removed
+
+- **Pro licensing, entirely**: `src/license.js` (`TMLicense`), Stripe checkout
+  (`startCheckout`), license-key activation/validation and the daily
+  re-validation alarm in `background.js`, the options page License section,
+  the popup upgrade banner and "PRO" tab badges, and the inline-panel upgrade
+  prompts. No `TM-` key, product id, or any other identifier is sent anywhere.
+
+### Added
+
+- `.gitleaks.toml`: extends the default ruleset and allowlists exactly one
+  literal - YouTube's public InnerTube web-client key, which `src/content.js`
+  uses as an extraction fallback (documented inline; not a secret).
+- CI `secrets` job: downloads a pinned gitleaks CLI (8.21.2, checksum
+  verified) and scans the full git history on every push and pull request.
 
 ## [1.1.0] - 2026-07-06 - Server-validated licensing + Stripe checkout
 

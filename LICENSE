@@ -1,23 +1,16 @@
-Proprietary License
+MIT License
 
-Copyright (c) 2026 Agentmatik s.r.o. All rights reserved.
+Copyright (c) 2026 Agentmatik s.r.o.
 
-This software and its source code are the proprietary property of
-Agentmatik s.r.o. ("Agentmatik").
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Permission is granted only to:
-1. Use the packaged extension as distributed by Agentmatik (for example via
-   the Chrome Web Store) under the terms presented at install time.
-2. View the source code if access to this repository has been granted, solely
-   for evaluation, security review, or contribution back to this project.
-
-Without prior written permission from Agentmatik you may NOT:
-- copy, modify, or create derivative works of this software;
-- redistribute, sublicense, sell, or offer this software or any part of it;
-- extract or reuse the source code, in whole or in part, in other software.
-
-Contributions submitted to this repository are licensed to Agentmatik for use
-under this license.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,5 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Contact: hello@agentmatik.ai
