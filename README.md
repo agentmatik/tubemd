@@ -2,9 +2,7 @@
 
 **Turn any YouTube video into agent-ready Markdown and skills - in your browser, with your keys**
 
-[![CI](https://github.com/agentmatik/tubemd/actions/workflows/ci.yml/badge.svg)](https://github.com/agentmatik/tubemd/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-orange.svg)](CHANGELOG.md)
+[![License](https://img.shields.io/github/license/agentmatik/tubemd)](https://github.com/agentmatik/tubemd/blob/main/LICENSE) [![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-black)](CHANGELOG.md) ![YouTube to agent-ready Markdown](https://img.shields.io/badge/YouTube%20to%20agent--ready%20Markdown-2ea043) ![your keys, in your browser](https://img.shields.io/badge/your%20keys%2C%20in%20your%20browser-2ea043) [![CI](https://github.com/agentmatik/tubemd/actions/workflows/ci.yml/badge.svg)](https://github.com/agentmatik/tubemd/actions/workflows/ci.yml)
 
 TubeMD is a Manifest V3 Chrome extension. It adds a panel to every YouTube
 watch page (plus a toolbar popup): one click reads the video's transcript and
